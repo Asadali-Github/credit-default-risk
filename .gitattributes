@@ -1,0 +1,8 @@
+# index.html is a build artefact produced by build_dashboard.py, and
+# dashboard_body.html is its template. Neither is the substance of this
+# project, so they are excluded from the repository language statistics.
+index.html          linguist-documentation
+dashboard_body.html linguist-documentation
+results.json        linguist-generated
+docs/*              linguist-documentation
+data/*              linguist-generated
