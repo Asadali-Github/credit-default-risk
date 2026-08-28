@@ -1,0 +1,883 @@
+<title>The Default Cut-Off</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600&family=Spectral:ital,wght@0,500;0,600;1,400&family=Spline+Sans+Mono:wght@400;500&display=swap">
+
+<style>
+:root {
+  --page:    #EFEDF0;
+  --card:    #FFFFFF;
+  --band:    #1E1A24;
+  --band-ink:#D9D2E0;
+  --ink:     #1E1A24;
+  --ink-2:   #4C4557;
+  --muted:   #7C7488;
+  --hair:    #DFDAE4;
+  --hair-2:  #EDE9F0;
+  --grid:    #EEEAF1;
+  --ember:   #B4501F;
+  --ember-f: rgba(180,80,31,.12);
+  --indigo:  #4A3E9E;
+  --indigo-f:rgba(74,62,158,.12);
+  --quiet:   #B9B1C2;
+  --focus:   #4A3E9E;
+  --shadow:  0 1px 2px rgba(30,26,36,.05), 0 10px 26px -16px rgba(30,26,36,.30);
+  /* risk ramp: one hue, weakest step first */
+  --r1:#F7E7DC; --r2:#F0D0BC; --r3:#E6B294; --r4:#D9926C;
+  --r5:#C9724A; --r6:#B4501F; --r7:#8F3D15; --r8:#6B2C0E;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page:    #141119;
+    --card:    #211E27;
+    --band:    #0D0B11;
+    --band-ink:#CDC4D6;
+    --ink:     #EEE9F2;
+    --ink-2:   #C2B9CD;
+    --muted:   #948BA2;
+    --hair:    #332C3D;
+    --hair-2:  #2A2432;
+    --grid:    #2C2635;
+    --ember:   #D4783E;
+    --ember-f: rgba(212,120,62,.16);
+    --indigo:  #8878E0;
+    --indigo-f:rgba(136,120,224,.16);
+    --quiet:   #574E64;
+    --focus:   #A797F0;
+    --shadow:  0 1px 2px rgba(0,0,0,.45), 0 12px 30px -18px rgba(0,0,0,.9);
+    --r1:#4A2A12; --r2:#5E3517; --r3:#75421C; --r4:#8D5122;
+    --r5:#A6642C; --r6:#BE7A3C; --r7:#D4955C; --r8:#E5B385;
+  }
+}
+:root[data-theme="dark"] {
+  --page:    #141119;
+  --card:    #211E27;
+  --band:    #0D0B11;
+  --band-ink:#CDC4D6;
+  --ink:     #EEE9F2;
+  --ink-2:   #C2B9CD;
+  --muted:   #948BA2;
+  --hair:    #332C3D;
+  --hair-2:  #2A2432;
+  --grid:    #2C2635;
+  --ember:   #D4783E;
+  --ember-f: rgba(212,120,62,.16);
+  --indigo:  #8878E0;
+  --indigo-f:rgba(136,120,224,.16);
+  --quiet:   #574E64;
+  --focus:   #A797F0;
+  --shadow:  0 1px 2px rgba(0,0,0,.45), 0 12px 30px -18px rgba(0,0,0,.9);
+  --r1:#4A2A12; --r2:#5E3517; --r3:#75421C; --r4:#8D5122;
+  --r5:#A6642C; --r6:#BE7A3C; --r7:#D4955C; --r8:#E5B385;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--page); color: var(--ink);
+  font-family: "Public Sans", "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+
+/* ---------- masthead ---------- */
+.band { background: var(--band); color: var(--band-ink); padding: 46px 0 40px; }
+h1 {
+  font-family: Spectral, Georgia, serif; font-weight: 600;
+  font-size: clamp(32px, 5vw, 56px); line-height: 1.04; letter-spacing: -.018em;
+  margin: 0 0 22px; color: #FFF; text-wrap: balance; max-width: 21ch;
+}
+.standfirst { font-family: Spectral, Georgia, serif; font-size: 17px; line-height: 1.62;
+  columns: 2; column-gap: 42px; margin: 0; color: var(--band-ink); }
+@media (max-width: 760px) { .standfirst { columns: 1; } }
+.dek { font-family: "Spline Sans Mono", ui-monospace, monospace; font-size: 11px;
+  letter-spacing: .12em; text-transform: uppercase; color: #8E829C; margin: 0 0 20px; }
+
+/* ---------- KPI band ---------- */
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--card);
+  border-bottom: 1px solid var(--hair); }
+.kpi { padding: 20px 22px; border-left: 1px solid var(--hair-2); }
+.kpi:first-child { border-left: 0; }
+.k-label { font-family: "Spline Sans Mono", ui-monospace, monospace; font-size: 10px;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+.k-value { font-family: Spectral, Georgia, serif; font-size: 32px; font-weight: 600;
+  line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.k-value.hot { color: var(--ember); }
+.k-note { font-size: 13px; color: var(--ink-2); margin-top: 6px; line-height: 1.4; }
+
+/* ---------- steps ---------- */
+main { padding: 32px 0 60px; display: flex; flex-direction: column; gap: 22px; }
+.step { background: var(--card); border: 1px solid var(--hair); border-radius: 2px;
+  box-shadow: var(--shadow); padding: 24px 26px 22px; }
+.step-head { display: grid; grid-template-columns: 46px 1fr; gap: 18px; align-items: start; }
+.step-no { font-family: "Spline Sans Mono", ui-monospace, monospace; font-size: 12px;
+  font-weight: 500; color: var(--card); background: var(--ink); border-radius: 2px;
+  padding: 4px 0; text-align: center; letter-spacing: .04em; margin-top: 4px; }
+.step-no.hot { background: var(--ember); }
+h2 { font-family: Spectral, Georgia, serif; font-weight: 600; font-size: 23px;
+  line-height: 1.22; letter-spacing: -.01em; margin: 0; text-wrap: balance; max-width: 30ch; }
+.claim { font-size: 14.5px; color: var(--ink-2); margin: 9px 0 0; max-width: 72ch; }
+.claim b { color: var(--ink); font-weight: 600; }
+.body { margin-top: 20px; }
+.split { display: grid; grid-template-columns: 1.15fr 1fr; gap: 30px; align-items: start; }
+
+/* ---------- shared chart furniture ---------- */
+figure { margin: 0; position: relative; }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+.grid-line { stroke: var(--grid); stroke-width: 1; }
+.axis-text { font-family: "Spline Sans Mono", ui-monospace, monospace; font-size: 10px;
+  fill: var(--muted); }
+.mark-label { font-family: "Spline Sans Mono", ui-monospace, monospace; font-size: 10.5px;
+  font-weight: 500; fill: var(--ink-2);
+  paint-order: stroke; stroke: var(--card); stroke-width: 3.5px; stroke-linejoin: round; }
+.series-line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.caption { font-family: "Spline Sans Mono", ui-monospace, monospace; font-size: 10px;
+  letter-spacing: .05em; color: var(--muted); margin: 10px 0 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-family: "Spline Sans Mono", ui-monospace, monospace;
+  font-size: 10.5px; color: var(--ink-2); margin-bottom: 12px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.sw.ln { height: 3px; width: 15px; }
+
+.tip { position: absolute; pointer-events: none; opacity: 0; transform: translate(-50%,-100%);
+  background: var(--band); color: var(--band-ink); border-radius: 2px; padding: 8px 10px;
+  font-family: "Spline Sans Mono", ui-monospace, monospace; font-size: 11px; line-height: 1.5;
+  white-space: nowrap; z-index: 5; box-shadow: 0 8px 20px -10px rgba(0,0,0,.6); }
+.tip.on { opacity: 1; }
+.tip b { color: #FFF; font-weight: 500; }
+
+/* ---------- scoreboard ---------- */
+.board { display: flex; flex-direction: column; gap: 3px; }
+.board-row { display: grid; grid-template-columns: 1fr 140px 56px 56px 56px; gap: 14px;
+  align-items: center; padding: 9px 0; border-bottom: 1px solid var(--hair-2); }
+.board-row.head { border-bottom: 1px solid var(--hair); padding-bottom: 6px; }
+.board-row.head span { font-family: "Spline Sans Mono", ui-monospace, monospace;
+  font-size: 9.5px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted);
+  text-align: right; }
+.board-row.head span:first-child { text-align: left; }
+.board-row.mine { background: var(--ember-f); margin: 0 -10px; padding-left: 10px;
+  padding-right: 10px; border-radius: 2px; }
+.b-name { font-size: 13.5px; line-height: 1.3; }
+.b-name small { display: block; font-family: "Spline Sans Mono", ui-monospace, monospace;
+  font-size: 9.5px; color: var(--muted); letter-spacing: .03em; margin-top: 2px; }
+.b-track { height: 9px; background: var(--hair-2); border-radius: 1px; overflow: hidden; }
+.b-fill { height: 100%; }
+.b-num { font-family: "Spline Sans Mono", ui-monospace, monospace; font-size: 12.5px;
+  text-align: right; font-variant-numeric: tabular-nums; }
+.b-num.dim { color: var(--muted); }
+
+/* ---------- group table ---------- */
+table { border-collapse: collapse; width: 100%; font-size: 13px;
+  font-variant-numeric: tabular-nums; }
+th, td { padding: 7px 8px; border-bottom: 1px solid var(--hair-2); text-align: right; }
+th:first-child, td:first-child { text-align: left; }
+th { font-family: "Spline Sans Mono", ui-monospace, monospace; font-size: 9.5px;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 400; }
+.cellbar { display: flex; align-items: center; gap: 7px; justify-content: flex-end; }
+.cellbar i { height: 7px; border-radius: 1px; display: block; }
+
+/* ---------- the cut-off control ---------- */
+.dial { border: 1px solid var(--hair); border-radius: 2px; padding: 18px 20px 16px;
+  background: var(--hair-2); }
+.dial-top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+  gap: 10px; }
+.dial-t { font-family: "Spline Sans Mono", ui-monospace, monospace; font-size: 10px;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.dial-v { font-family: Spectral, Georgia, serif; font-size: 30px; font-weight: 600;
+  font-variant-numeric: tabular-nums; line-height: 1; color: var(--ember); }
+input[type=range] { width: 100%; margin: 16px 0 4px; accent-color: var(--ember); height: 22px; }
+input[type=range]:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.presets { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+.presets button { font-family: "Spline Sans Mono", ui-monospace, monospace; font-size: 10.5px;
+  padding: 5px 10px; border: 1px solid var(--hair); background: var(--card);
+  color: var(--ink-2); border-radius: 2px; cursor: pointer; }
+.presets button:hover { border-color: var(--ember); color: var(--ember); }
+.presets button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.outcome { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; margin-top: 18px;
+  background: var(--hair); border: 1px solid var(--hair); }
+.cell { background: var(--card); padding: 13px 14px; }
+.cell .c-n { font-family: Spectral, Georgia, serif; font-size: 26px; font-weight: 600;
+  line-height: 1; font-variant-numeric: tabular-nums; }
+.cell .c-l { font-family: "Spline Sans Mono", ui-monospace, monospace; font-size: 9.5px;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.cell .c-d { font-size: 12.5px; color: var(--ink-2); margin-top: 5px; line-height: 1.35; }
+.cell.bad .c-n { color: var(--ember); }
+.readout { display: flex; flex-wrap: wrap; gap: 6px 26px; margin-top: 16px;
+  font-family: "Spline Sans Mono", ui-monospace, monospace; font-size: 12px; }
+.readout span { color: var(--muted); }
+.readout b { color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+details { margin-top: 16px; border-top: 1px solid var(--hair-2); padding-top: 10px; }
+summary { font-family: "Spline Sans Mono", ui-monospace, monospace; font-size: 10px;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--muted); cursor: pointer; }
+summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.scroll { overflow-x: auto; margin-top: 10px; }
+
+footer { border-top: 1px solid var(--hair); padding: 22px 0 44px; color: var(--muted);
+  font-size: 13px; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 26px; justify-content: space-between; }
+footer a, .band a { color: inherit; text-underline-offset: 3px; }
+a:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+@media (max-width: 900px) {
+  .split { grid-template-columns: 1fr; gap: 24px; }
+  .kpis { grid-template-columns: 1fr 1fr; }
+  .kpi:nth-child(3) { border-left: 0; }
+  .kpi:nth-child(n+3) { border-top: 1px solid var(--hair-2); }
+  .step-head { grid-template-columns: 38px 1fr; gap: 12px; }
+  .board-row { grid-template-columns: 1fr 70px 46px 46px 46px; gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="band"><div class="wrap">
+  <p class="dek">Credit risk · 30,000 accounts · UCI</p>
+  <h1>A credit model that is 78% accurate can be worth nothing.</h1>
+  <p class="standfirst">Twenty-two percent of these accounts defaulted. Predict that nobody
+  defaults and you are right 77.9% of the time — and you have built nothing. What follows is
+  the sequence that turns a score into a decision: pick a metric that can be failed, beat a
+  baseline worth beating, refuse the columns you should not price on, and then choose the
+  cut-off by what the two mistakes actually cost.</p>
+</div></div>
+
+<div class="kpis" id="kpis"></div>
+
+<div class="wrap"><main>
+
+  <!-- 01 -->
+  <section class="step">
+    <div class="step-head">
+      <div class="step-no">01</div>
+      <div>
+        <h2>Score it against something that can lose.</h2>
+        <p class="claim" id="c-1"></p>
+      </div>
+    </div>
+    <div class="body">
+      <div class="board" id="board"></div>
+      <p class="caption">ROC-AUC · higher is better. PR-AUC is the one that notices the class
+        imbalance; Brier is the one that notices whether the number means anything.</p>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section class="step">
+    <div class="step-head">
+      <div class="step-no">02</div>
+      <div>
+        <h2>Almost all of the signal is last month's behaviour.</h2>
+        <p class="claim" id="c-2"></p>
+      </div>
+    </div>
+    <div class="body split">
+      <div>
+        <figure><svg id="c-delinq" viewBox="0 0 520 280" role="img"
+          aria-label="Default rate by last month's repayment status"></svg>
+          <div class="tip" id="t-delinq"></div></figure>
+        <p class="caption">Default rate by last month's repayment status · dashed line is the
+          22.1% portfolio average</p>
+      </div>
+      <div>
+        <figure><svg id="c-imp" viewBox="0 0 400 280" role="img"
+          aria-label="Permutation importance of the top model features"></svg>
+          <div class="tip" id="t-imp"></div></figure>
+        <p class="caption">Permutation importance · how much ROC-AUC is lost when each feature
+          is shuffled</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section class="step">
+    <div class="step-head">
+      <div class="step-no">03</div>
+      <div>
+        <h2>Sex, education, marital status and age are in the file. They come out.</h2>
+        <p class="claim" id="c-3"></p>
+      </div>
+    </div>
+    <div class="body split">
+      <div>
+        <figure><svg id="c-slope" viewBox="0 0 440 250" role="img"
+          aria-label="Model ROC-AUC with and without protected attributes"></svg></figure>
+        <p class="caption">Test-set ROC-AUC, same split, same hyperparameters · the axis spans 0.75–0.80, so the gap is shown at true scale rather than stretched</p>
+      </div>
+      <div>
+        <div class="scroll" id="tb-fair"></div>
+        <p class="caption">Withholding the columns is step one. This table is step two — the
+          decision still lands differently on different groups, because behaviour correlates
+          with them. It is reported, not hidden.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section class="step">
+    <div class="step-head">
+      <div class="step-no">04</div>
+      <div>
+        <h2>Ranked by score, the defaults pile up at one end.</h2>
+        <p class="claim" id="c-4"></p>
+      </div>
+    </div>
+    <div class="body">
+      <figure><svg id="c-lift" viewBox="0 0 900 280" role="img"
+        aria-label="Default rate by risk decile"></svg>
+        <div class="tip" id="t-lift"></div></figure>
+      <p class="caption">Test accounts sorted by predicted risk and cut into ten equal groups ·
+        dashed line is the 22.1% portfolio average</p>
+    </div>
+  </section>
+
+  <!-- 05 -->
+  <section class="step">
+    <div class="step-head">
+      <div class="step-no hot">05</div>
+      <div>
+        <h2>Now choose where to draw the line.</h2>
+        <p class="claim" id="c-5"></p>
+      </div>
+    </div>
+    <div class="body split">
+      <div>
+        <figure><svg id="c-cost" viewBox="0 0 520 290" role="img"
+          aria-label="Expected cost per 1,000 applications across decision thresholds"></svg>
+          <div class="tip" id="t-cost"></div></figure>
+        <p class="caption">Cost per 1,000 applications, charging 5 for a missed default and 1
+          for a good customer wrongly declined</p>
+      </div>
+      <div>
+        <div class="dial">
+          <div class="dial-top">
+            <span class="dial-t">Decision threshold</span>
+            <span class="dial-v" id="d-val">0.17</span>
+          </div>
+          <input type="range" id="slider" min="5" max="90" step="1" value="17"
+                 aria-label="Decision threshold, as a percentage">
+          <div class="presets">
+            <button type="button" data-set="best">Cost-optimal</button>
+            <button type="button" data-set="50">The habitual 0.50</button>
+            <button type="button" data-set="10">Cautious 0.10</button>
+          </div>
+        </div>
+        <div class="outcome" id="outcome"></div>
+        <div class="readout" id="readout"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 -->
+  <section class="step">
+    <div class="step-head">
+      <div class="step-no">06</div>
+      <div>
+        <h2>And check that the number means what it says.</h2>
+        <p class="claim" id="c-6"></p>
+      </div>
+    </div>
+    <div class="body split">
+      <div>
+        <figure><svg id="c-cal" viewBox="0 0 440 300" role="img"
+          aria-label="Predicted probability against observed default rate"></svg>
+          <div class="tip" id="t-cal"></div></figure>
+        <p class="caption">Predicted risk against what actually happened, in ten equal-sized
+          groups · the diagonal is perfect</p>
+      </div>
+      <div>
+        <div class="legend">
+          <span><i class="sw ln" style="background:var(--ember)"></i>ROC</span>
+          <span><i class="sw ln" style="background:var(--indigo)"></i>Precision–recall</span>
+          <span><i class="sw ln" style="background:var(--quiet)"></i>Chance</span>
+        </div>
+        <figure><svg id="c-roc" viewBox="0 0 440 260" role="img"
+          aria-label="ROC and precision-recall curves"></svg></figure>
+        <p class="caption" id="cap-roc"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- closing -->
+  <section class="step">
+    <div class="step-head">
+      <div class="step-no">✓</div>
+      <div>
+        <h2>What it would do on the next thousand applications.</h2>
+        <p class="claim" id="c-7"></p>
+      </div>
+    </div>
+    <details><summary>Every threshold, in full</summary>
+      <div class="scroll" id="tb-cost"></div></details>
+  </section>
+
+</main></div>
+
+<footer><div class="wrap">
+  <span>Analysis and page by <b>Asad Ali</b> — MSc Data Science, University of Essex.</span>
+  <span>Every figure is produced by <code>analysis.py</code> in the
+    <a href="https://github.com/Asadali-Github/credit-default-risk">source repository</a>.</span>
+</div></footer>
+
+<script>
+const R = /*__RESULTS__*/{};
+
+const NS = "http://www.w3.org/2000/svg";
+const el = (n, a = {}) => { const e = document.createElementNS(NS, n);
+  for (const k in a) e.setAttribute(k, a[k]); return e; };
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const pct = (v, d = 0) => (v * 100).toFixed(d) + "%";
+const fmt = n => n.toLocaleString("en-GB");
+
+function ticks(max, steps = [1, 2, 2.5, 4, 5, 10]) {
+  const raw = max / 4, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = (steps.find(s => s * mag >= raw) ?? 10) * mag;
+  const top = Math.ceil(max / step - 1e-9) * step;
+  const values = [];
+  for (let i = 0; i * step <= top + 1e-9; i++) values.push(+(i * step).toFixed(6));
+  return { step, values, max: top };
+}
+function tooltip(fig, tip) {
+  return {
+    show(x, y, html) { tip.innerHTML = html; tip.classList.add("on");
+      const r = fig.getBoundingClientRect(), s = fig.querySelector("svg").getBoundingClientRect();
+      tip.style.left = (s.left - r.left + x * s.width) + "px";
+      tip.style.top = (s.top - r.top + y * s.height - 10) + "px"; },
+    hide() { tip.classList.remove("on"); }
+  };
+}
+function ramp(i, n) { return css("--r" + Math.min(8, Math.max(1, Math.round(1 + i / Math.max(1, n - 1) * 7)))); }
+function table(host, cols, rows) {
+  const t = document.createElement("table");
+  t.innerHTML = "<thead><tr>" + cols.map(c => `<th>${c}</th>`).join("") + "</tr></thead><tbody>"
+    + rows.map(r => "<tr>" + r.map(v => `<td>${v}</td>`).join("") + "</tr>").join("") + "</tbody>";
+  host.replaceChildren(t);
+}
+
+/* ---------- KPI band ---------- */
+(function () {
+  const q = R.data_quality, m = R.models.behaviour_only, c = R.cost, l = R.lift;
+  const cells = [
+    { l: "Accounts", v: fmt(q.rows), c: "", n: `${pct(q.default_rate, 1)} defaulted · no missing values` },
+    { l: "Model ROC-AUC", v: m.roc_auc.toFixed(3), c: "",
+      n: `against ${R.models.one_rule.roc_auc.toFixed(3)} for the one-variable baseline` },
+    { l: "Decision threshold", v: c.best.threshold.toFixed(2), c: "hot",
+      n: `chosen on cost — ${c.saving_vs_half_pct}% cheaper than the habitual 0.50` },
+    { l: "Riskiest decile", v: l.top_decile_lift + "×", c: "",
+      n: `defaults at ${pct(l.top_decile_rate)} against a ${pct(l.base_rate, 1)} book` }
+  ];
+  document.getElementById("kpis").innerHTML = cells.map(x =>
+    `<div class="kpi"><div class="k-label">${x.l}</div>
+     <div class="k-value ${x.c}">${x.v}</div><div class="k-note">${x.n}</div></div>`).join("");
+})();
+
+/* ---------- 01 scoreboard ---------- */
+(function () {
+  const m = R.models;
+  const order = ["never_default", "one_rule", "raw_only", "with_protected", "behaviour_only"];
+  const rows = order.map(k => ({ key: k, ...m[k] }));
+  const host = document.getElementById("board");
+  host.innerHTML = `<div class="board-row head"><span>Model</span><span></span>
+    <span>ROC-AUC</span><span>PR-AUC</span><span>Brier</span></div>` + rows.map(r => {
+    const mine = r.key === "behaviour_only";
+    const w = ((r.roc_auc - 0.5) / 0.32 * 100).toFixed(1);
+    return `<div class="board-row${mine ? " mine" : ""}">
+      <div class="b-name">${r.label}<small>${r.detail}</small></div>
+      <div class="b-track"><div class="b-fill" style="width:${Math.max(0, w)}%;
+        background:${mine ? "var(--ember)" : "var(--quiet)"}"></div></div>
+      <div class="b-num${mine ? "" : " dim"}">${r.roc_auc.toFixed(3)}</div>
+      <div class="b-num dim">${r.pr_auc.toFixed(3)}</div>
+      <div class="b-num dim">${r.brier.toFixed(3)}</div></div>`;
+  }).join("");
+
+  const q = R.data_quality, nd = m.never_default, b = m.behaviour_only, one = m.one_rule;
+  document.getElementById("c-1").innerHTML =
+    `The null model is <b>${pct(nd.accuracy, 1)}</b> accurate and has a ROC-AUC of
+     <b>0.500</b> — it ranks nothing. The baseline worth beating is not that: it is last
+     month's repayment status on its own (<b>${one.roc_auc.toFixed(3)}</b>), which is roughly
+     what a credit officer reads off the file by eye. The shipped model reaches
+     <b>${b.roc_auc.toFixed(3)}</b>, and its PR-AUC of <b>${b.pr_auc.toFixed(3)}</b> against a
+     ${pct(q.default_rate, 1)} base rate is the number that says it found real structure.`;
+})();
+
+/* ---------- 02 delinquency ladder + importance ---------- */
+(function () {
+  const svg = document.getElementById("c-delinq");
+  const tip = tooltip(svg.parentElement, document.getElementById("t-delinq"));
+  const W = 520, H = 280, M = { t: 22, r: 16, b: 56, l: 46 };
+  const iw = W - M.l - M.r, ih = H - M.t - M.b;
+  const rows = R.risk_profile.by_delinquency;
+  const ax = ticks(Math.max(...rows.map(r => r.rate)));
+  const y = v => M.t + ih - (v / ax.max) * ih;
+  for (const v of ax.values) {
+    svg.appendChild(el("line", { class: "grid-line", x1: M.l, x2: W - M.r, y1: y(v), y2: y(v) }));
+    const t = el("text", { class: "axis-text", x: M.l - 9, y: y(v) + 3.5, "text-anchor": "end" });
+    t.textContent = pct(v); svg.appendChild(t);
+  }
+  const step = iw / rows.length, bw = step - 12;
+  const hottest = Math.max(...rows.map(r => r.rate));
+  const WRAP = { "No balance": ["No", "balance"], "Paid in full": ["Paid in", "full"],
+    "Revolving": ["Revolving"], "1 month late": ["1 month", "late"],
+    "2 months late": ["2 months", "late"], "3+ months late": ["3+ months", "late"] };
+  rows.forEach((r, i) => {
+    // Sequential colour follows the value, not the bar's place in the row —
+    // otherwise "Revolving" would read as riskier than "Paid in full".
+    const bx = M.l + step * i + 6;
+    const c = css("--r" + Math.max(1, Math.round(r.rate / hottest * 8)));
+    const bar = el("rect", { x: bx, y: y(r.rate), width: bw, height: M.t + ih - y(r.rate),
+      fill: c, rx: 2 });
+    bar.addEventListener("mousemove", () => tip.show((bx + bw / 2) / W, y(r.rate) / H,
+      `<b>${r.bucket}</b><br>${pct(r.rate, 1)} defaulted<br>
+       <span style="opacity:.6">${fmt(r.n)} accounts</span>`));
+    bar.addEventListener("mouseleave", tip.hide);
+    svg.appendChild(bar);
+    const v = el("text", { class: "mark-label", x: bx + bw / 2, y: y(r.rate) - 7,
+      "text-anchor": "middle" });
+    v.textContent = pct(r.rate); svg.appendChild(v);
+    const words = WRAP[r.bucket] || r.bucket.split(" ");
+    words.forEach((w, k) => {
+      const t = el("text", { class: "axis-text", x: bx + bw / 2, y: H - M.b + 18 + k * 12,
+        "text-anchor": "middle" });
+      t.textContent = w; svg.appendChild(t);
+    });
+  });
+  const base = R.data_quality.default_rate;
+  svg.appendChild(el("line", { x1: M.l, x2: W - M.r, y1: y(base), y2: y(base),
+    stroke: css("--muted"), "stroke-dasharray": "4 3" }));
+
+  // permutation importance
+  const svg2 = document.getElementById("c-imp");
+  const tip2 = tooltip(svg2.parentElement, document.getElementById("t-imp"));
+  const W2 = 400, H2 = 280, M2 = { t: 8, r: 54, b: 30, l: 112 };
+  const iw2 = W2 - M2.l - M2.r, ih2 = H2 - M2.t - M2.b;
+  const imp = R.importance.slice(0, 8);
+  const xmax = Math.max(...imp.map(d => d.drop_in_auc));
+  const st = ih2 / imp.length, bh = Math.min(18, st - 5);
+  const NAMES = { delinq_max: "Worst arrears", PAY_0: "Last month's status",
+    delinq_months: "Months in arrears", delinq_trend: "Arrears trend",
+    util_max: "Peak utilisation", util_trend: "Utilisation trend",
+    util_mean: "Mean utilisation", pay_total: "Total paid, 6 months",
+    bill_total: "Total billed, 6 months", pay_to_bill: "Paid ÷ billed",
+    paid_full_months: "Months paid in full", cover_mean: "Mean bill coverage",
+    cover_min: "Worst bill coverage", LIMIT_BAL: "Credit limit" };
+  const nice = k => NAMES[k] || (/^util(\d)$/.test(k) ? `Utilisation, m${k.slice(4)}`
+    : /^cover(\d)$/.test(k) ? `Coverage, m${k.slice(5)}`
+    : /^BILL_AMT(\d)$/.test(k) ? `Bill, month ${k.slice(8)}`
+    : /^PAY_AMT(\d)$/.test(k) ? `Payment, month ${k.slice(7)}`
+    : /^PAY_(\d)$/.test(k) ? `Status, month ${k.slice(4)}` : k);
+  imp.forEach((d, i) => {
+    const yy = M2.t + st * i + (st - bh) / 2;
+    const w = Math.max(2, d.drop_in_auc / xmax * iw2);
+    const bar = el("rect", { x: M2.l, y: yy, width: w, height: bh,
+      fill: i === 0 ? css("--ember") : css("--r3"), rx: 2 });
+    bar.addEventListener("mousemove", () => tip2.show((M2.l + w) / W2, yy / H2,
+      `<b>${nice(d.feature)}</b><br>−${d.drop_in_auc.toFixed(4)} ROC-AUC when shuffled`));
+    bar.addEventListener("mouseleave", tip2.hide);
+    svg2.appendChild(bar);
+    const lab = el("text", { class: "axis-text", x: M2.l - 8, y: yy + bh / 2 + 3.5,
+      "text-anchor": "end", "font-size": 10.5, fill: css("--ink-2") });
+    lab.textContent = nice(d.feature); svg2.appendChild(lab);
+    const val = el("text", { class: "mark-label", x: M2.l + w + 8, y: yy + bh / 2 + 3.5 });
+    val.textContent = d.drop_in_auc.toFixed(3); svg2.appendChild(val);
+  });
+
+  const late2 = rows.find(r => r.bucket === "2 months late");
+  const rev = rows.find(r => r.bucket === "Revolving");
+  document.getElementById("c-2").innerHTML =
+    `An account that is revolving a balance defaults <b>${pct(rev.rate, 1)}</b> of the time.
+     Two months behind, that becomes <b>${pct(late2.rate, 1)}</b> — a
+     <b>${(late2.rate / rev.rate).toFixed(1)}×</b> jump, and the single sharpest edge in the
+     data. Shuffle the worst-arrears column and the model loses
+     <b>${R.importance[0].drop_in_auc.toFixed(3)}</b> ROC-AUC, three times more than any
+     other feature. Credit risk here is mostly recent conduct, and only faintly anything else.`;
+})();
+
+/* ---------- 03 protected attributes ---------- */
+(function () {
+  const svg = document.getElementById("c-slope");
+  const W = 440, H = 250, M = { t: 34, r: 90, b: 46, l: 90 };
+  const iw = W - M.l - M.r, ih = H - M.t - M.b;
+  const a = R.models.with_protected.roc_auc, b = R.models.behaviour_only.roc_auc;
+  const lo = 0.74, hi = 0.80;
+  const y = v => M.t + ih - (v - lo) / (hi - lo) * ih;
+  [0.75, 0.76, 0.77, 0.78, 0.79, 0.80].forEach(v => {
+    svg.appendChild(el("line", { class: "grid-line", x1: M.l - 20, x2: W - M.r + 20,
+      y1: y(v), y2: y(v) }));
+    const t = el("text", { class: "axis-text", x: M.l - 28, y: y(v) + 3.5, "text-anchor": "end" });
+    t.textContent = v.toFixed(2); svg.appendChild(t);
+  });
+  const pts = [[M.l, a, "With them", css("--quiet")], [M.l + iw, b, "Without them", css("--ember")]];
+  svg.appendChild(el("line", { class: "series-line", x1: pts[0][0], y1: y(a),
+    x2: pts[1][0], y2: y(b), stroke: css("--ember"), "stroke-width": 2.5 }));
+  pts.forEach(([x, v, label, colour]) => {
+    svg.appendChild(el("circle", { cx: x, cy: y(v), r: 7, fill: colour,
+      stroke: css("--card"), "stroke-width": 2.5 }));
+    const n = el("text", { class: "mark-label", x, y: y(v) - 16, "text-anchor": "middle",
+      "font-size": 13, fill: css("--ink"), "font-weight": 600 });
+    n.textContent = v.toFixed(4); svg.appendChild(n);
+    const l = el("text", { class: "axis-text", x, y: H - M.b + 22, "text-anchor": "middle",
+      "font-size": 11, fill: css("--ink-2") });
+    l.textContent = label; svg.appendChild(l);
+  });
+  const note = el("text", { class: "axis-text", x: W / 2, y: M.t - 16, "text-anchor": "middle",
+    fill: css("--ember"), "font-size": 11 });
+  note.textContent = `${(b - a >= 0 ? "+" : "")}${(b - a).toFixed(4)} ROC-AUC`;
+  svg.appendChild(note);
+
+  const f = R.fairness;
+  const groups = [...f.by_sex, ...f.by_education];
+  const maxRate = Math.max(...groups.map(g => Math.max(g.flagged_pct, g.actual_default_rate)));
+  const bar = (v, colour) =>
+    `<div class="cellbar"><i style="width:${(v / maxRate * 54).toFixed(1)}px;background:${colour}"></i>
+     <span>${pct(v, 1)}</span></div>`;
+  table(document.getElementById("tb-fair"),
+    ["Group", "Declined at 0.17", "Actually defaulted", "ROC-AUC"],
+    groups.map(g => [g.group, bar(g.flagged_pct, "var(--ember)"),
+      bar(g.actual_default_rate, "var(--indigo)"), g.auc.toFixed(3)]));
+
+  const male = f.by_sex.find(g => g.group === "Male"), fem = f.by_sex.find(g => g.group === "Female");
+  document.getElementById("c-3").innerHTML =
+    `Trained with those four columns the model scores <b>${a.toFixed(4)}</b>; trained without
+     them, <b>${b.toFixed(4)}</b>. Dropping them costs nothing measurable, so there is no
+     trade-off to argue about — they go. What survives is worth stating: at the chosen
+     threshold the model still declines <b>${pct(male.flagged_pct, 1)}</b> of men against
+     <b>${pct(fem.flagged_pct, 1)}</b> of women, because repayment behaviour is not
+     independent of who holds the account. Removing a column removes the column, not the
+     correlation.`;
+})();
+
+/* ---------- 04 decile lift ---------- */
+(function () {
+  const svg = document.getElementById("c-lift");
+  const tip = tooltip(svg.parentElement, document.getElementById("t-lift"));
+  const W = 900, H = 280, M = { t: 26, r: 20, b: 46, l: 52 };
+  const iw = W - M.l - M.r, ih = H - M.t - M.b;
+  const d = R.lift.deciles, base = R.lift.base_rate;
+  const ax = ticks(Math.max(...d.map(x => x.rate)));
+  const y = v => M.t + ih - (v / ax.max) * ih;
+  for (const v of ax.values) {
+    svg.appendChild(el("line", { class: "grid-line", x1: M.l, x2: W - M.r, y1: y(v), y2: y(v) }));
+    const t = el("text", { class: "axis-text", x: M.l - 10, y: y(v) + 3.5, "text-anchor": "end" });
+    t.textContent = pct(v); svg.appendChild(t);
+  }
+  const step = iw / d.length, bw = step - 14;
+  d.forEach((x, i) => {
+    const bx = M.l + step * i + 7, c = ramp(d.length - 1 - i, d.length);
+    const bar = el("rect", { x: bx, y: y(x.rate), width: bw, height: M.t + ih - y(x.rate),
+      fill: c, rx: 2 });
+    bar.addEventListener("mousemove", () => tip.show((bx + bw / 2) / W, y(x.rate) / H,
+      `<b>Decile ${x.decile}</b><br>${pct(x.rate, 1)} defaulted · ${x.lift}× the book<br>
+       <span style="opacity:.6">${fmt(x.n)} accounts</span>`));
+    bar.addEventListener("mouseleave", tip.hide);
+    svg.appendChild(bar);
+    const v = el("text", { class: "mark-label", x: bx + bw / 2, y: y(x.rate) - 7,
+      "text-anchor": "middle" });
+    v.textContent = pct(x.rate); svg.appendChild(v);
+    const t = el("text", { class: "axis-text", x: bx + bw / 2, y: H - M.b + 18,
+      "text-anchor": "middle" });
+    t.textContent = x.decile === 1 ? "riskiest" : x.decile === 10 ? "safest" : String(x.decile);
+    svg.appendChild(t);
+  });
+  svg.appendChild(el("line", { x1: M.l, x2: W - M.r, y1: y(base), y2: y(base),
+    stroke: css("--muted"), "stroke-dasharray": "4 3" }));
+  const bl = el("text", { class: "mark-label", x: W - M.r, y: y(base) - 7, "text-anchor": "end",
+    fill: css("--muted") });
+  bl.textContent = `portfolio average ${pct(base, 1)}`; svg.appendChild(bl);
+
+  const l = R.lift;
+  document.getElementById("c-4").innerHTML =
+    `The riskiest tenth defaults at <b>${pct(l.top_decile_rate)}</b> — <b>${l.top_decile_lift}×</b>
+     the book — and the safest tenth at <b>${pct(l.deciles[9].rate, 1)}</b>. Three deciles hold
+     <b>${pct(l.captured_in_top_3)}</b> of every default in the test set. This is the shape that
+     matters operationally: a collections team can work 30% of the book and reach two-thirds of
+     the losses.`;
+})();
+
+/* ---------- 05 the cut-off ---------- */
+(function () {
+  const curve = R.cost.curve, best = R.cost.best;
+  const svg = document.getElementById("c-cost");
+  const tip = tooltip(svg.parentElement, document.getElementById("t-cost"));
+  const W = 520, H = 290, M = { t: 22, r: 18, b: 46, l: 56 };
+  const iw = W - M.l - M.r, ih = H - M.t - M.b;
+  const ax = ticks(Math.max(...curve.map(c => c.cost_per_1000)));
+  const x = t => M.l + (t - 0.05) / (0.90 - 0.05) * iw;
+  const y = v => M.t + ih - (v / ax.max) * ih;
+  for (const v of ax.values) {
+    svg.appendChild(el("line", { class: "grid-line", x1: M.l, x2: W - M.r, y1: y(v), y2: y(v) }));
+    const t = el("text", { class: "axis-text", x: M.l - 9, y: y(v) + 3.5, "text-anchor": "end" });
+    t.textContent = fmt(v); svg.appendChild(t);
+  }
+  [0.1, 0.3, 0.5, 0.7, 0.9].forEach(t => {
+    const l = el("text", { class: "axis-text", x: x(t), y: H - M.b + 18, "text-anchor": "middle" });
+    l.textContent = t.toFixed(1); svg.appendChild(l);
+  });
+  const d = curve.map((c, i) => (i ? "L" : "M") + x(c.threshold).toFixed(1) + " "
+    + y(c.cost_per_1000).toFixed(1)).join(" ");
+  svg.appendChild(el("path", { d: `${d} L${x(0.9)} ${y(0)} L${x(0.05)} ${y(0)} Z`,
+    fill: css("--ember-f") }));
+  svg.appendChild(el("path", { class: "series-line", d, stroke: css("--ember") }));
+
+  // the habitual 0.50, marked so the comparison is visible not asserted
+  const half = R.cost.at_half;
+  svg.appendChild(el("line", { x1: x(0.5), x2: x(0.5), y1: M.t, y2: M.t + ih,
+    stroke: css("--quiet"), "stroke-dasharray": "3 3" }));
+  const hl = el("text", { class: "mark-label", x: x(0.5) + 7, y: M.t + 30,
+    fill: css("--muted") });
+  hl.textContent = `0.50 → ${fmt(half.cost_per_1000)}`; svg.appendChild(hl);
+
+  const live = el("line", { x1: x(best.threshold), x2: x(best.threshold), y1: M.t, y2: M.t + ih,
+    stroke: css("--ember"), "stroke-width": 1.5 });
+  svg.appendChild(live);
+  const dot = el("circle", { cx: x(best.threshold), cy: y(best.cost_per_1000), r: 5,
+    fill: css("--ember"), stroke: css("--card"), "stroke-width": 2 });
+  svg.appendChild(dot);
+  const minLab = el("text", { class: "mark-label", x: x(best.threshold) + 7, y: M.t + 13,
+    fill: css("--ember"), "font-weight": 600 });
+  minLab.textContent = `cheapest ${fmt(best.cost_per_1000)}`; svg.appendChild(minLab);
+  const cap = el("text", { class: "axis-text", x: W / 2, y: H - 8, "text-anchor": "middle" });
+  cap.textContent = "decision threshold"; svg.appendChild(cap);
+
+  const hit = el("rect", { x: M.l, y: M.t, width: iw, height: ih, fill: "transparent" });
+  svg.appendChild(hit);
+  const slider = document.getElementById("slider");
+  hit.addEventListener("mousemove", ev => {
+    const r = svg.getBoundingClientRect();
+    const t = 0.05 + ((ev.clientX - r.left) / r.width * W - M.l) / iw * 0.85;
+    const c = curve.reduce((a, b) => Math.abs(b.threshold - t) < Math.abs(a.threshold - t) ? b : a);
+    tip.show(x(c.threshold) / W, y(c.cost_per_1000) / H,
+      `<b>threshold ${c.threshold.toFixed(2)}</b><br>cost ${fmt(c.cost_per_1000)} per 1,000<br>
+       <span style="opacity:.6">recall ${pct(c.recall)} · precision ${pct(c.precision)}</span>`);
+  });
+  hit.addEventListener("mouseleave", tip.hide);
+  hit.addEventListener("click", ev => {
+    const r = svg.getBoundingClientRect();
+    const t = 0.05 + ((ev.clientX - r.left) / r.width * W - M.l) / iw * 0.85;
+    slider.value = String(Math.round(Math.min(0.90, Math.max(0.05, t)) * 100));
+    render();
+  });
+
+  const outcome = document.getElementById("outcome");
+  const readout = document.getElementById("readout");
+  function render() {
+    const t = +slider.value / 100;
+    const c = curve.reduce((a, b) => Math.abs(b.threshold - t) < Math.abs(a.threshold - t) ? b : a);
+    document.getElementById("d-val").textContent = c.threshold.toFixed(2);
+    live.setAttribute("x1", x(c.threshold)); live.setAttribute("x2", x(c.threshold));
+    dot.setAttribute("cx", x(c.threshold)); dot.setAttribute("cy", y(c.cost_per_1000));
+    const p = c.per_1000;
+    outcome.innerHTML = `
+      <div class="cell bad"><div class="c-l">Caught</div><div class="c-n">${p.tp}</div>
+        <div class="c-d">defaulters declined — the losses avoided</div></div>
+      <div class="cell bad"><div class="c-l">Missed</div><div class="c-n">${p.fn}</div>
+        <div class="c-d">defaulters approved — these are the expensive ones</div></div>
+      <div class="cell"><div class="c-l">Wrongly declined</div><div class="c-n">${p.fp}</div>
+        <div class="c-d">good customers turned away</div></div>
+      <div class="cell"><div class="c-l">Correctly approved</div><div class="c-n">${p.tn}</div>
+        <div class="c-d">good customers kept</div></div>`;
+    readout.innerHTML =
+      `<span>Cost per 1,000 <b>${fmt(c.cost_per_1000)}</b></span>
+       <span>Recall <b>${pct(c.recall)}</b></span>
+       <span>Precision <b>${pct(c.precision)}</b></span>
+       <span>Declined <b>${pct(c.flagged_pct)}</b> of applicants</span>`;
+    document.getElementById("c-7").innerHTML =
+      `At a threshold of <b>${c.threshold.toFixed(2)}</b>, out of every 1,000 applications the
+       model declines <b>${p.tp + p.fp}</b> people. <b>${p.tp}</b> of them would have defaulted
+       and <b>${p.fp}</b> would not — that is the price of catching them. <b>${p.fn}</b>
+       defaulters still get through. Whether that is the right trade depends on the 5:1 cost
+       ratio assumed here; change it and the cheapest threshold moves, which is the point.`;
+  }
+  slider.addEventListener("input", render);
+  document.querySelectorAll("[data-set]").forEach(b => b.addEventListener("click", () => {
+    slider.value = b.dataset.set === "best" ? String(Math.round(best.threshold * 100))
+      : b.dataset.set;
+    render();
+  }));
+  render();
+
+  document.getElementById("c-5").innerHTML =
+    `A threshold of 0.50 is a convention, not a decision. Charging <b>5</b> for a default that
+     slips through and <b>1</b> for a good customer wrongly declined, the cheapest cut-off is
+     <b>${best.threshold.toFixed(2)}</b>: <b>${fmt(best.cost_per_1000)}</b> per 1,000
+     applications against <b>${fmt(half.cost_per_1000)}</b> at 0.50, a
+     <b>${R.cost.saving_vs_half_pct}%</b> saving. It catches <b>${pct(best.recall)}</b> of
+     defaulters instead of <b>${pct(half.recall)}</b>, and pays for that with precision. Move
+     the slider — the trade is the whole job.`;
+
+  table(document.getElementById("tb-cost"),
+    ["Threshold", "Cost / 1,000", "Recall", "Precision", "Declined", "Caught", "Missed"],
+    curve.filter((_, i) => i % 2 === 0).map(c => [c.threshold.toFixed(2), fmt(c.cost_per_1000),
+      pct(c.recall, 1), pct(c.precision, 1), pct(c.flagged_pct, 1), c.per_1000.tp, c.per_1000.fn]));
+})();
+
+/* ---------- 06 calibration + curves ---------- */
+(function () {
+  const svg = document.getElementById("c-cal");
+  const tip = tooltip(svg.parentElement, document.getElementById("t-cal"));
+  const W = 440, H = 300, M = { t: 16, r: 16, b: 46, l: 50 };
+  const iw = W - M.l - M.r, ih = H - M.t - M.b;
+  const cal = R.curves.calibration;
+  const max = 0.8;
+  const x = v => M.l + v / max * iw, y = v => M.t + ih - v / max * ih;
+  [0, 0.2, 0.4, 0.6, 0.8].forEach(v => {
+    svg.appendChild(el("line", { class: "grid-line", x1: M.l, x2: W - M.r, y1: y(v), y2: y(v) }));
+    const a = el("text", { class: "axis-text", x: M.l - 9, y: y(v) + 3.5, "text-anchor": "end" });
+    a.textContent = pct(v); svg.appendChild(a);
+    const b = el("text", { class: "axis-text", x: x(v), y: H - M.b + 18, "text-anchor": "middle" });
+    b.textContent = pct(v); svg.appendChild(b);
+  });
+  svg.appendChild(el("line", { x1: x(0), y1: y(0), x2: x(max), y2: y(max),
+    stroke: css("--quiet"), "stroke-dasharray": "4 3" }));
+  const d = cal.map((c, i) => (i ? "L" : "M") + x(c.predicted).toFixed(1) + " "
+    + y(c.observed).toFixed(1)).join(" ");
+  svg.appendChild(el("path", { class: "series-line", d, stroke: css("--ember") }));
+  cal.forEach(c => {
+    const dot = el("circle", { cx: x(c.predicted), cy: y(c.observed), r: 4.5,
+      fill: css("--ember"), stroke: css("--card"), "stroke-width": 2 });
+    dot.addEventListener("mousemove", () => tip.show(x(c.predicted) / W, y(c.observed) / H,
+      `predicted <b>${pct(c.predicted, 1)}</b><br>observed <b>${pct(c.observed, 1)}</b>`));
+    dot.addEventListener("mouseleave", tip.hide);
+    svg.appendChild(dot);
+  });
+  const xl = el("text", { class: "axis-text", x: W / 2, y: H - 8, "text-anchor": "middle" });
+  xl.textContent = "predicted risk"; svg.appendChild(xl);
+  const yl = el("text", { class: "axis-text", x: -(M.t + ih / 2), y: 12,
+    transform: "rotate(-90)", "text-anchor": "middle" });
+  yl.textContent = "observed default rate"; svg.appendChild(yl);
+
+  // ROC + PR on one square
+  const s2 = document.getElementById("c-roc");
+  const W2 = 440, H2 = 260, M2 = { t: 12, r: 16, b: 40, l: 44 };
+  const iw2 = W2 - M2.l - M2.r, ih2 = H2 - M2.t - M2.b;
+  const X = v => M2.l + v * iw2, Y = v => M2.t + ih2 - v * ih2;
+  [0, 0.25, 0.5, 0.75, 1].forEach(v => {
+    s2.appendChild(el("line", { class: "grid-line", x1: M2.l, x2: W2 - M2.r, y1: Y(v), y2: Y(v) }));
+    const a = el("text", { class: "axis-text", x: M2.l - 8, y: Y(v) + 3.5, "text-anchor": "end" });
+    a.textContent = v.toFixed(2); s2.appendChild(a);
+    const b = el("text", { class: "axis-text", x: X(v), y: H2 - M2.b + 17, "text-anchor": "middle" });
+    b.textContent = v.toFixed(2); s2.appendChild(b);
+  });
+  s2.appendChild(el("line", { x1: X(0), y1: Y(0), x2: X(1), y2: Y(1),
+    stroke: css("--quiet"), "stroke-dasharray": "4 3" }));
+  s2.appendChild(el("line", { x1: X(0), y1: Y(R.curves.base_rate), x2: X(1),
+    y2: Y(R.curves.base_rate), stroke: css("--quiet"), "stroke-dasharray": "4 3" }));
+  const roc = R.curves.roc.map((p, i) => (i ? "L" : "M") + X(p.fpr).toFixed(1) + " " + Y(p.tpr).toFixed(1)).join(" ");
+  const pr = R.curves.pr.map((p, i) => (i ? "L" : "M") + X(p.recall).toFixed(1) + " " + Y(p.precision).toFixed(1)).join(" ");
+  s2.appendChild(el("path", { class: "series-line", d: roc, stroke: css("--ember") }));
+  s2.appendChild(el("path", { class: "series-line", d: pr, stroke: css("--indigo") }));
+  const xl2 = el("text", { class: "axis-text", x: W2 / 2, y: H2 - 6, "text-anchor": "middle" });
+  xl2.textContent = "false-positive rate (ROC) · recall (PR)"; s2.appendChild(xl2);
+
+  const m = R.models.behaviour_only;
+  document.getElementById("cap-roc").textContent =
+    `ROC-AUC ${m.roc_auc.toFixed(3)} · PR-AUC ${m.pr_auc.toFixed(3)} against a `
+    + `${pct(R.curves.base_rate, 1)} base rate — the lower dashed line is what a coin would score.`;
+
+  const worst = Math.max(...cal.map(c => Math.abs(c.predicted - c.observed)));
+  document.getElementById("c-6").innerHTML =
+    `Ranking is not enough — a credit score gets read as a probability, quoted in a policy and
+     summed into an expected-loss figure, so it has to be true at face value. Across ten
+     equal-sized groups the largest gap between predicted and observed risk is
+     <b>${(worst * 100).toFixed(1)} percentage points</b>, and the Brier score is
+     <b>${m.brier.toFixed(3)}</b> against <b>${R.models.never_default.brier.toFixed(3)}</b> for
+     the null model. When this model says 43%, roughly 43% of those accounts default.`;
+})();
+</script>
